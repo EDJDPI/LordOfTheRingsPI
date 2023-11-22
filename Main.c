@@ -25,6 +25,8 @@ int main()
 	struct Sides stables = { "LL", "MK" };
 	struct Sides armoury = { "GF", "DF" };
 	struct Sides infantry = { "G", "OW" };
+	struct Sides cavalry = { "SK", "W" };
+	struct Sides artillery = { "T", "ST" };
 	struct CastarCoins startingCoin;
 	startingCoin.gon = 100;
 	startingCoin.mor = 100;
