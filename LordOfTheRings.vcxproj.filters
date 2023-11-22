@@ -18,5 +18,8 @@
     <ClCompile Include="lof.c">
       <Filter>Arquivos de Recurso</Filter>
     </ClCompile>
+    <ClCompile Include="Main.c">
+      <Filter>Arquivos de Recurso</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
