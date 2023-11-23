@@ -1,6 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
+#include "lof.h"
+
 
 
 struct Sides {
@@ -15,7 +17,10 @@ struct CastarCoins
 };
 
 int main()
+
 {
+	MainMenu();
+	
 	int sides = 1; //por exemplo 1 se o player escolhesse mondor e 0 se fosse gondor
 	int c1, c2;
 	

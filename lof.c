@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Windows.h>
+#include "lof.h"
 //Start game selection
+
+
 
 void StartGame() {
 	int choice1, choice2;
@@ -31,6 +34,7 @@ void StartGame() {
 				else if (choice2 == 2)
 				{
 					printf("You have chosen MORDOR side!!\n\n STARTING GAME.....");
+					
 				}
 				else
 				{
@@ -77,7 +81,4 @@ int MainMenu() {
 		printf("Exiting the game!!");
 		break;
 	}
-}
-int main() {
-	MainMenu();
 }
