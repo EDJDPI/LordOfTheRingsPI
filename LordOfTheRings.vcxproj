@@ -127,7 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lof.c" />
+    <ClCompile Include="Menu.c" />
     <ClCompile Include="Main.c" />
   </ItemGroup>
   <ItemGroup>
