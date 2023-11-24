@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#include "lof.h"
+
 
 
 
@@ -16,10 +16,10 @@ struct CastarCoins
 	int mor;
 };
 
-int main()
+int wow()
 
 {
-	MainMenu();
+		
 	
 	int sides = 1; //por exemplo 1 se o player escolhesse mondor e 0 se fosse gondor
 	int c1, c2;
@@ -41,9 +41,9 @@ int main()
 
 	printf("What do you want to build: \n1-Bases\n2-Mines\n3-Barracks\n4-Stables\n5-Armoury\n");
 	scanf("%d", &c1);
-	if (c1 = 1)
+	if (c1 == 1)
 	{
-		if (sides = 1)
+		if (sides == 1)
 		{
 			printf("Base Construida: %s\n", bases.mordor);
 			startingCoin.mor -= 25;
@@ -53,6 +53,8 @@ int main()
 	}
 
 }
+
+
 
 
 
