@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "lof.h"
 
 
 
@@ -15,15 +15,10 @@ struct CastarCoins
 	int gon;
 	int mor;
 };
-
-int wow()
-
-{
-		
-	
+int coiso() {
 	int sides = 1; //por exemplo 1 se o player escolhesse mondor e 0 se fosse gondor
 	int c1, c2;
-	
+
 	struct Sides bases = { "GGGG", "MMMM" };
 	struct Sides mines = { "SS", "EE" };
 	struct Sides barracks = { "RR", "II" };
@@ -35,26 +30,29 @@ int wow()
 	struct CastarCoins startingCoin;
 	startingCoin.gon = 100;
 	startingCoin.mor = 100;
-	
-	
 
 
-	printf("What do you want to build: \n1-Bases\n2-Mines\n3-Barracks\n4-Stables\n5-Armoury\n");
-	scanf("%d", &c1);
-	if (c1 == 1)
+
+printf("What do you want to build: \n1-Bases\n2-Mines\n3-Barracks\n4-Stables\n5-Armoury\n");
+scanf("%d", &c1);
+if (c1 = 1)
+{
+	if (sides = 1)
 	{
-		if (sides == 1)
-		{
-			printf("Base Construida: %s\n", bases.mordor);
-			startingCoin.mor -= 25;
-			printf("%s\n", infantry.mordor);
-			printf("%d", startingCoin.mor);
-		}
+		printf("Base Construida: %s\n", bases.mordor);
+		startingCoin.mor -= 25;
+		printf("%s\n", infantry.mordor);
+		printf("%d", startingCoin.mor);
 	}
-
 }
 
+}
+int main()
 
+{
+	MainMenu();
+
+}
 
 
 

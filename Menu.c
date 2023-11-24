@@ -33,11 +33,12 @@ void StartGame() {
 				if (choice2 == 1)
 				{
 					printf("You have chosen the GONDOR/RIVENDELL side!!\n\n STARTING GAME.....");
+					coiso();
 				}
 				else if (choice2 == 2)
 				{
 					printf("You have chosen MORDOR side!!\n\n STARTING GAME.....");
-					
+					coiso();
 				}
 				else
 				{
