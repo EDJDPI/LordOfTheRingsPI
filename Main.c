@@ -205,7 +205,7 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
     int choice;
 
     // Display Castar Coins information
-    printf("Player %d - Castar Coins: Gondor %d, Mordor %d\n", currentPlayer, coins->gon, coins->mor);
+    printf("Player %s - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
     // Allow the player to choose between placing a building or a unit
     printf("Choose an action:\n");
@@ -267,14 +267,19 @@ void PlaceUnit(char board[ROWS][COLUMNS], struct Unit* unit)
     column = toupper(column);
 
     // Check if the selected cell is empty
-    if (board[row][column - 'A'] == ' ') {
-        // Place the unit
-        board[row][column - 'A'] = unit->name[0];  // Place the first letter of the unit's name
-        printf("Unit placed successfully!\n");
-    }
-    else {
-        printf("Selected cell is occupied. Please choose an empty cell.\n");
-    }
+	int i = 0;
+	while(i == 0)
+	{
+		if (board[row][column - 'A'] == ' ') {
+			// Place the unit
+			board[row][column - 'A'] = unit->name[0];  // Place the first letter of the unit's name
+			printf("Unit placed successfully!\n");
+			i = 1;
+		}
+		else {
+			printf("Selected cell is occupied. Please choose an empty cell.\n");
+		}
+	}
 }
 
 void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building* building)
