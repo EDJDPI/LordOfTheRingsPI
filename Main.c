@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define ROWS 17
 #define COLUMNS 27
@@ -292,22 +293,22 @@ void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building* building)
 
     // Convert column input to uppercase
     char column;
-printf("Enter the column (A-Z): ");
-scanf(" %c", &column);
-column = toupper(column);
+	printf("Enter the column (A-Z): ");
+	scanf(" %c", &column);
+	column = toupper(column);
 
 // Check if the selected cell is empty
-if (column >= 'A' && column <= 'Z' && board[row][column - 'A'] == ' ') 
-{
-   for (int i = 0; building->name[i] != '\0'; i++) 
+	if (column >= 'A' && column <= 'Z' && board[row][column + 1 - 'A'] == ' ') 
 	{
-        board[row][column + 1 - 'A' + i] = building->name[i];
-    }
-printf("Building placed successfully!\n");
+		for (int i = 0; building->name[i] != '\0'; i++) 
+		{
+			board[row][column + 1 - 'A' + i] = building->name[i];
+		}
+	printf("Building placed successfully!\n");
 	} 
 	else 
 	{
-    printf("Invalid column or selected cell is occupied. Please choose a valid and empty cell.\n");
+		printf("Invalid column or selected cell is occupied. Please choose a valid and empty cell.\n");
 	}
 }
 
@@ -322,6 +323,7 @@ void initializeBoard(char board[ROWS][COLUMNS]) {
 
 // Print the game board
 void printBoard(char board[ROWS][COLUMNS]) {
+	Sleep(1000);
 	system("cls");
 	printf("   ");
 	for (int j = 1; j < COLUMNS; j++) {
