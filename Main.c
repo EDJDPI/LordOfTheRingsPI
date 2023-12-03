@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
+#include <windows.h>
 
 #define ROWS 17
 #define COLUMNS 27
@@ -279,6 +281,7 @@ void PlaceUnit(char board[ROWS][COLUMNS], struct Unit* unit)
 		}
 		else {
 			printf("Selected cell is occupied. Please choose an empty cell.\n");
+			
 		}
 	}
 }
@@ -286,30 +289,35 @@ void PlaceUnit(char board[ROWS][COLUMNS], struct Unit* unit)
 void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building* building)
 {
     int row;
-
-    // Get input for building placement
-    printf("Enter the row (1-%d): ", ROWS - 1);
-    scanf("%d", &row);
-
-    // Convert column input to uppercase
     char column;
-	printf("Enter the column (A-Z): ");
-	scanf(" %c", &column);
-	column = toupper(column);
 
-// Check if the selected cell is empty
-	if (column >= 'A' && column <= 'Z' && board[row][column + 1 - 'A'] == ' ') 
-	{
-		for (int i = 0; building->name[i] != '\0'; i++) 
-		{
-			board[row][column + 1 - 'A' + i] = building->name[i];
-		}
-	printf("Building placed successfully!\n");
-	} 
-	else 
-	{
-		printf("Invalid column or selected cell is occupied. Please choose a valid and empty cell.\n");
-	}
+    do {
+        // Get input for building placement
+        printf("Enter the row (1-%d): ", ROWS - 1);
+        scanf("%d", &row);
+
+        // Convert column input to uppercase
+        printf("Enter the column (A-Z): ");
+        scanf(" %c", &column);
+        column = toupper(column);
+
+        // Check if the selected cell is empty
+        if (column >= 'A' && column <= 'Z' && board[row][column + 1 - 'A'] == ' ') 
+        {
+            // Place the building
+            for (int i = 0; building->name[i] != '\0'; i++) 
+            {
+                board[row][column + 1 - 'A' + i] = building->name[i];
+            }
+            printf("Building placed successfully!\n");
+            break; // Exit the loop since valid input was provided
+        } 
+        else 
+        {
+            printf("Invalid column or selected cell is occupied. Please choose a valid and empty cell.\n");
+        }
+
+    } while (1); // Loop until valid input is provided
 }
 
 // Initialize the game board with empty spaces
@@ -323,7 +331,6 @@ void initializeBoard(char board[ROWS][COLUMNS]) {
 
 // Print the game board
 void printBoard(char board[ROWS][COLUMNS]) {
-	Sleep(1000);
 	system("cls");
 	printf("   ");
 	for (int j = 1; j < COLUMNS; j++) {
