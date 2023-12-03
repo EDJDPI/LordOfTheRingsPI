@@ -205,7 +205,7 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
     int choice;
 
     // Display Castar Coins information
-    printf("Player %d - Castar Coins: Gondor %d, Mordor %d\n", currentPlayer, coins->gon, coins->mor);
+    printf("Player %s - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
     // Allow the player to choose between placing a building or a unit
     printf("Choose an action:\n");
@@ -287,24 +287,23 @@ void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building* building)
 
     // Convert column input to uppercase
     char column;
-    printf("Enter the column (A-Z): ");
-    scanf(" %c", &column);
-	column = column + 1;
-    column = column - 'A' + 1;  // Convert to a 1-based index
-    column = toupper(column);
+printf("Enter the column (A-Z): ");
+scanf(" %c", &column);
+column = toupper(column);
 
-    // Check if the selected cell is empty
-    if (board[row][column - 1] == ' ') {
-        // Place the building
-        for (int i = 0; building->name[i] != '\0'; i++) {
-            // Place each character of the building to the right of the selected cell
-            board[row][column - 1 + i] = building->name[i];
-        }
-        printf("Building placed successfully!\n");
+// Check if the selected cell is empty
+if (column >= 'A' && column <= 'Z' && board[row][column - 'A'] == ' ') 
+{
+   for (int i = 0; building->name[i] != '\0'; i++) 
+	{
+        board[row][column + 1 - 'A' + i] = building->name[i];
     }
-    else {
-        printf("Selected cell is occupied. Please choose an empty cell.\n");
-    }
+printf("Building placed successfully!\n");
+	} 
+	else 
+	{
+    printf("Invalid column or selected cell is occupied. Please choose a valid and empty cell.\n");
+	}
 }
 
 // Initialize the game board with empty spaces
@@ -318,7 +317,7 @@ void initializeBoard(char board[ROWS][COLUMNS]) {
 
 // Print the game board
 void printBoard(char board[ROWS][COLUMNS]) {
-	// Print column labels
+	system("cls");
 	printf("   ");
 	for (int j = 1; j < COLUMNS; j++) {
 		printf("%3c ", 'A' + j - 1);
