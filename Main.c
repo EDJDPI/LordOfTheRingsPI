@@ -22,9 +22,10 @@ struct Building
 struct Unit
 {
 	char name[20];
-	int cost;
+	int movecost;
 	int attackPower;
 	int health;
+	int cost;
 };
 
 // Struct for representing player resources
@@ -64,16 +65,16 @@ int main()
 		{"DF", 30, 70}};
 
 	struct Unit gondorUnits[] = {
-		{"G", 2, 5, 30},
-		{"SK", 1, 7, 40},
-		{"T", 3, 10, 20}
+		{"G", 2, 5, 30, 20},
+		{"SK", 1, 7, 40, 10},
+		{"T", 3, 10, 20, 30}
 
 	};
 
 	struct Unit mordorUnits[] = {
-		{"OW", 2, 5, 30},
-		{"W", 1, 7, 40},
-		{"ST", 3, 10, 20}};
+		{"OW", 2, 5, 30, 20},
+		{"W", 1, 7, 40, 10},
+		{"ST", 3, 10, 20, 30}};
 
 	struct CastarCoins startingCoin;
 	startingCoin.gon = 100;
@@ -84,51 +85,52 @@ int main()
 	MainMenu(gameBoard, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, &startingCoin);
 	return 0;
 }
-
-void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
-{
-
-	int choice1, choice2;
+void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins* coins) {
+	int choice;
 	printf("Choose one option below: \n");
 	printf("1- Play vs Computer\n");
 	printf("2- Play vs Friend\n");
-	do
-	{
-		scanf("%d", &choice1);
-		if (choice1 == 1)
-		{
-			// Martim fazer
+	do {
+		scanf("%d", &choice);
+		if (choice == 1) {
+			// Handle computer logic (if needed)
 		}
-		else if (choice1 == 2)
-		{
+		else if (choice == 2) {
+			SelectSides(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
+		}
+	} while (choice != 1 && choice != 2);
+}
+
+void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins* coins) {
+
+	int choice;
 			printf("Player 1 - Choose Your Side\n");
 			printf("1-GONDOR\n");
 			printf("2-MORDOR\n");
-
 			// Loops until the player chooses a valid option
-			do
-			{
-				scanf("%d", &choice2);
-				if (choice2 == 1)
-				{
+			do {
+				scanf("%d", &choice);
+				if (choice == 1) {
 					printf("You have chosen the GONDOR side!!\n\n");
 					currentPlayer = 1;
+					// Pass the necessary data to StartGame
 					StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
+
 				}
-				else if (choice2 == 2)
-				{
+				else if (choice == 2) {
 					printf("You have chosen MORDOR side!!\n\n");
 					currentPlayer = 2;
+					// Pass the necessary data to StartGame
 					StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
 				}
-				else
-				{
+				else {
 					printf("Invalid option, choose again\n");
 				}
-			} while (choice2 != 1 && choice2 != 2);
-		}
-	} while (choice1 != 1);
+			} while (choice != 1 && choice != 2);
 }
+
+
+
 
 void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
 {
@@ -186,7 +188,7 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	{
 	case 1:
 		system("cls");
-		SelectSides(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
+		SelectGameMode(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
 		break;
 	case 2:
 		system("cls");
