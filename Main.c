@@ -192,7 +192,7 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 
 	int choice;
 
-	system("cls");
+	system("clear");
 	printf("------- GAME MENU ---------\n");
 	printf("------- 1-Start Game ------\n");
 	printf("------- 2-Load Game -------\n");
@@ -204,19 +204,19 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	switch (choice)
 	{
 	case 1:
-		system("cls");
+		system("clear");
 		SelectGameMode(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
 		break;
 	case 2:
-		system("cls");
+		system("clear");
 		printf("Loading game...");
 		break;
 	case 3:
-		system("cls");
+		system("clear");
 		printf("Menu Options : ");
 		break;
 	case 4:
-		system("cls");
+		system("clear");
 		printf("Exiting the game!!");
 		break;
 	}
@@ -228,7 +228,7 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	int endTurn;
 	do
 	{
-		system("cls");
+	system("clear");
 	printBoard(board);
 	// Display Castar Coins information
 		printf("%s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
@@ -245,7 +245,7 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 		switch (choice)
 		{
 	case 1:
-		PlaceBuilding(board, gondorBuildings, mordorBuildings, coins);
+		PlaceBuilding(board, gondorBuildings, mordorBuildings, gondorMines, mordorMines, coins);
 		break;
 	case 2:
 		PlaceUnit(board, gondorUnits, mordorUnits, coins);
@@ -382,31 +382,26 @@ void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building)
 
 	do
 	{
+    printf("Enter the row (1-%d): ", ROWS - 1);
+    scanf(" %c", &suca);
 
-		printf("Enter the row (1-%d): ", ROWS - 1);
-		scanf(" %c", &suca);
+    // Convert the character to an integer
+    row = suca - '0';
 
-		if(suca < 1 || suca > ROWS - 1 )
-		{	
-			while(suca < 1 || suca > ROWS - 1)
-			{
-				printf("Invalid row. Please choose a valid row.");
-				printf("Enter the row (1-%d): ", ROWS - 1);
-				scanf(" %c", &suca);
-			}
-		}
-		
-		row = suca - '0';
+    // Check if the row is within the valid range
+    while (row < 1 || row > ROWS - 1) 
+	{
+        printf("Invalid row. Please choose a valid row.\n");
+        printf("Enter the row (1-%d): ", ROWS - 1);
+        scanf(" %c", &suca);
+        // Convert the character to an integer again
+        row = suca - '0';
+    }
 
-		// Check if the row is valid
-		if (row < 1 || row >= ROWS) 
-		{
-			printf("Invalid row. Please choose a valid row.\n");
-		}
-		else
-		{
-			row += 1;
-		}
+    // Now 'row' contains a valid row number
+    printf("Selected row: %d\n", row);
+
+
 		
 		
 
