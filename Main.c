@@ -27,7 +27,13 @@ struct Unit
 	int health;
 	int cost;
 };
-
+struct Mines
+{
+	char name[20];
+	int cost;
+	int health;
+	int coinsperturn;
+};
 // Struct for representing player resources
 struct CastarCoins
 {
@@ -39,28 +45,27 @@ struct CastarCoins
 void initializeBoard(char board[ROWS][COLUMNS]);
 void printBoard(char board[ROWS][COLUMNS]);
 void insertContent(char board[ROWS][COLUMNS], int row, int col, char content);
-void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
-void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
-void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
+void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins);
+void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins);
+void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins);
 int CheckWin(struct Building gondorBuildings[], struct Building mordorBuildings[]);
 void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
 void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *unitArray);
-void PlaceBuilding(char board[ROWS][COLUMNS], struct Building mordorBuildings[], struct Building gondorBuildings[], struct CastarCoins *coins);
+void PlaceBuilding(char board[ROWS][COLUMNS], struct Building mordorBuildings[], struct Building gondorBuildings[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins);
 void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building);
-
+void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins);
+void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins);
 // Run Program
 int main()
 {
 	struct Building gondorBuildings[] = {
 		{"GGGG", 30, 100},
-		{"SS", 20, 50},
 		{"RR", 25, 70},
 		{"LL", 25, 70},
 		{"GF", 30, 70}};
 
 	struct Building mordorBuildings[] = {
 		{"MMMM", 30, 100},
-		{"EE", 20, 50},
 		{"II", 25, 70},
 		{"MK", 25, 70},
 		{"DF", 30, 70}};
@@ -77,71 +82,80 @@ int main()
 		{"W", 1, 7, 40, 10},
 		{"ST", 3, 10, 20, 30}};
 
+	struct Mines gondorMines[] = {
+		{"SS", 20, 50, 5}};
+	struct Mines mordorMines[] = {
+		{"EE", 20, 50, 5}};
+
 	struct CastarCoins startingCoin;
 	startingCoin.gon = 100;
 	startingCoin.mor = 100;
 
 	char gameBoard[ROWS][COLUMNS];
 	initializeBoard(gameBoard);
-	MainMenu(gameBoard, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, &startingCoin);
+	MainMenu(gameBoard, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, &startingCoin);
 	return 0;
 }
-void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins* coins) {
+void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins)
+{
 	int choice;
 	printf("Choose one option below: \n");
 	printf("1- Play vs Computer\n");
 	printf("2- Play vs Friend\n");
-	do {
+	do
+	{
 		scanf("%d", &choice);
-		if (choice == 1) {
+		if (choice == 1)
+		{
 			// Handle computer logic (if needed)
 		}
-		else if (choice == 2) {
-			SelectSides(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
+		else if (choice == 2)
+		{
+			SelectSides(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
 		}
 	} while (choice != 1 && choice != 2);
 }
 
-void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins* coins) {
+void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins)
+{
 
 	int choice;
-			printf("Player 1 - Choose Your Side\n");
-			printf("1-GONDOR\n");
-			printf("2-MORDOR\n");
-			// Loops until the player chooses a valid option
-			do {
-				scanf("%d", &choice);
-				if (choice == 1) {
-					printf("You have chosen the GONDOR side!!\n\n");
-					currentPlayer = 1;
-					// Pass the necessary data to StartGame
-					StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
-
-				}
-				else if (choice == 2) {
-					printf("You have chosen MORDOR side!!\n\n");
-					currentPlayer = 2;
-					// Pass the necessary data to StartGame
-					StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
-				}
-				else {
-					printf("Invalid option, choose again\n");
-				}
-			} while (choice != 1 && choice != 2);
+	printf("Player 1 - Choose Your Side\n");
+	printf("1-GONDOR\n");
+	printf("2-MORDOR\n");
+	// Loops until the player chooses a valid option
+	do
+	{
+		scanf("%d", &choice);
+		if (choice == 1)
+		{
+			printf("You have chosen the GONDOR side!!\n\n");
+			currentPlayer = 1;
+			// Pass the necessary data to StartGame
+			StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
+		}
+		else if (choice == 2)
+		{
+			printf("You have chosen MORDOR side!!\n\n");
+			currentPlayer = 2;
+			// Pass the necessary data to StartGame
+			StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
+		}
+		else
+		{
+			printf("Invalid option, choose again\n");
+		}
+	} while (choice != 1 && choice != 2);
 }
 
-
-
-
-void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
+void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins)
 {
 	while (gameStatus == 0)
 	{
 		// Display the board
-		printBoard(board);
 
 		// Take a turn for the current player
-		TakeTurn(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
+		TakeTurn(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
 
 		// Check for a win or a draw
 		gameStatus = CheckWin(gondorBuildings, mordorBuildings);
@@ -171,7 +185,7 @@ int CheckWin(struct Building gondorBuildings[], struct Building mordorBuildings[
 }
 
 // Main menu
-void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
+void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins)
 {
 
 	int choice;
@@ -189,7 +203,7 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	{
 	case 1:
 		system("cls");
-		SelectGameMode(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, coins);
+		SelectGameMode(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
 		break;
 	case 2:
 		system("cls");
@@ -206,43 +220,53 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	}
 }
 
-void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
+void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins)
 {
 	int choice;
 	int endTurn;
 	do
-{	
-	// Display Castar Coins information
-	printf("%s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
+	{
+		system("cls");
+		printBoard(board);
+		// Display Castar Coins information
+		printf("%s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
-	// Allow the player to choose between placing a building or a unit
-	printf("Choose an action:\n");
-	printf("1- Place Building\n");
-	printf("2- Place Unit\n");
-	printf("3- End Turn\n");
-	scanf("%d", &choice);
+		// Allow the player to choose between placing a building or a unit
+		printf("Choose an action:\n");
+		printf("1- Place Building\n");
+		printf("2- Place Unit\n");
+		printf("3- End Turn\n");
+		scanf("%d", &choice);
 
-	printf(" End turn = %d", endTurn);
+		printf(" End turn = %d", endTurn);
 
-	switch (choice)
+		switch (choice)
 		{
-	case 1:
-		PlaceBuilding(board, gondorBuildings, mordorBuildings, coins);
-		break;
-	case 2:
-		PlaceUnit(board, gondorUnits, mordorUnits, coins);
-		break;
-	case 3:
-		printf("Turn Ended.\n");
-		endTurn = 1;
-		break;
-	default:
-		printf("Invalid choice. Turn skipped.\n");
+		case 1:
+			PlaceBuilding(board, gondorBuildings, mordorBuildings, gondorMines, mordorMines, coins);
+			break;
+		case 2:
+			PlaceUnit(board, gondorUnits, mordorUnits, coins);
+			break;
+		case 3:
+			printf("Turn Ended.\n");
+			endTurn = 1;
+			if (currentPlayer == 1)
+			{
+				coins->gon += 15;
+			}
+			else
+			{
+				coins->mor += 15;
+			}
+			break;
+		default:
+			printf("Invalid choice. Turn skipped.\n");
 		}
-	}while(endTurn != 1);
+	} while (endTurn != 1);
 }
 
-void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct CastarCoins *coins)
+void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins)
 {
 	int row;
 	int choice;
@@ -252,7 +276,7 @@ void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[],
 
 	// Logic to choose a building
 	printf("Choose building:\n");
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		printf("%d - %s\n", i + 1, buildingArray[i].name);
 	}
@@ -264,7 +288,7 @@ void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[],
 	{
 		// Set the chosen building
 		struct Building *building = &buildingArray[choice - 1];
-				if (currentPlayer == 1)
+		if (currentPlayer == 1)
 		{
 			coins->gon -= building->cost;
 		}
@@ -299,7 +323,7 @@ void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit
 	{
 		// Set the chosen building
 		struct Unit *units = &unitArray[choice - 1];
-				if (currentPlayer == 1)
+		if (currentPlayer == 1)
 		{
 			coins->gon -= units->cost;
 		}
@@ -347,23 +371,21 @@ void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *units)
 	} while (success != 1);
 }
 
-
 void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building)
 {
-	int row;
+	int row = 0;
 	int success = 0;
 
 	do
 	{
-		// Get input for building placement
-		printf("Enter the row (1-%d): ", ROWS - 1);
-		scanf("%d", &row);
 
-		// Check if the row is valid
-		if (row < 1 || row >= ROWS)
+		printf("Enter the row (1-%d): ", ROWS - 1);
+		while (scanf("%d", &row) != 1 || row < 1 || row >= ROWS)
 		{
-			printf("Invalid row. Please choose a valid row.\n");
-			return;
+			printf("Invalid input. Please enter a valid row.\n");
+			printf("Enter the row (1-%d): ", ROWS - 1);
+			// Clear the input buffer in case of non-integer input
+			while (getchar() != '\n');
 		}
 
 		// Convert column input to uppercase
