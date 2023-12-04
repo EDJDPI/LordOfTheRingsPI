@@ -43,7 +43,8 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
 void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
 int CheckWin(struct Building gondorBuildings[], struct Building mordorBuildings[]);
-void PlaceUnit(char board[ROWS][COLUMNS], struct Unit *unit);
+void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
+void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *unitArray);
 void PlaceBuilding(char board[ROWS][COLUMNS], struct Building mordorBuildings[], struct Building gondorBuildings[], struct CastarCoins *coins);
 void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building);
 
@@ -221,6 +222,7 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	printf("3- End Turn\n");
 	scanf("%d", &choice);
 
+	printf(" End turn = %d", endTurn);
 
 	switch (choice)
 		{
@@ -228,7 +230,7 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 		PlaceBuilding(board, gondorBuildings, mordorBuildings, coins);
 		break;
 	case 2:
-		PlaceUnit(board, (currentPlayer == 1) ? &gondorUnits[0] : &mordorUnits[0]);
+		PlaceUnit(board, gondorUnits, mordorUnits, coins);
 		break;
 	case 3:
 		printf("Turn Ended.\n");
@@ -278,38 +280,73 @@ void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[],
 	}
 }
 
-void PlaceUnit(char board[ROWS][COLUMNS], struct Unit *unit)
+void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
 {
-	int row, col;
+	struct Unit *unitArray = (currentPlayer == 1) ? gondorUnits : mordorUnits;
+	int row, choice;
 
-	// Get input for unit placement
-	printf("Enter the row (1-%d) and column (A-Z) separated by a space: ", ROWS);
-	scanf("%d", &row);
-
-	// Convert column input to uppercase
-	char column;
-	printf("Enter the column (A-Z): ");
-	scanf(" %c", &column);
-	column = toupper(column);
-
-	// Check if the selected cell is empty
-	int i = 0;
-	while (i == 0)
+	// Logic to choose a building
+	printf("Choose Unit:\n");
+	for (int i = 0; i < 3; ++i)
 	{
-		if (board[row][column - 'A'] == ' ')
+		printf("%d - %s\n", i + 1, unitArray[i].name);
+	}
+
+	scanf("%d", &choice);
+
+	// Handle the user's choice
+	if (choice >= 1 && choice <= 5)
+	{
+		// Set the chosen building
+		struct Unit *units = &unitArray[choice - 1];
+				if (currentPlayer == 1)
 		{
-			// Place the unit
-			board[row][column - 'A'] = unit->name[0]; // Place the first letter of the unit's name
-			printf("Unit placed successfully!\n");
-			i = 1;
+			coins->gon -= units->cost;
 		}
 		else
 		{
-			printf("Selected cell is occupied. Please choose an empty cell.\n");
-			Sleep(2000);
+			coins->mor -= units->cost;
 		}
+		PlaceBuildingHelper(board, units);
+	}
+	else
+	{
+		printf("Invalid choice. Unit not placed.\n");
 	}
 }
+
+void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *units)
+{
+	int row;
+	int success = 0;
+
+	do
+	{
+		// Get input for unit placement
+		printf("Enter the row (1-%d) and column (A-Z) separated by a space: ", ROWS);
+		scanf("%d", &row);
+
+		// Convert column input to uppercase
+		char column;
+		printf("Enter the column (A-Z): ");
+		scanf(" %c", &column);
+		column = toupper(column);
+
+		// Check if the selected cell is empty
+		if (row >= 1 && row < ROWS && column >= 'A' && column <= 'Z' && board[row][column - 'A'] == ' ')
+		{
+			// Place the unit
+			board[row][column - 'A'] = units->name[0]; // Place the first letter of the unit's name
+			printf("Unit placed successfully!\n");
+			success = 1;
+		}
+		else
+		{
+			printf("Invalid row, column, or selected cell is occupied. Please choose a valid and empty cell.\n");
+		}
+	} while (success != 1);
+}
+
 
 void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building)
 {
