@@ -43,7 +43,7 @@ void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], str
 void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
 int CheckWin(struct Building gondorBuildings[], struct Building mordorBuildings[]);
 void PlaceUnit(char board[ROWS][COLUMNS], struct Unit *unit);
-void PlaceBuilding(char board[ROWS][COLUMNS], struct Building mordorBuildings[], struct Building gondorBuildings[]);
+void PlaceBuilding(char board[ROWS][COLUMNS], struct Building mordorBuildings[], struct Building gondorBuildings[], struct CastarCoins *coins);
 void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building);
 
 // Run Program
@@ -206,7 +206,9 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
 {
 	int choice;
-
+	int endTurn;
+	do
+{	
 	// Display Castar Coins information
 	printf("%s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
@@ -214,23 +216,29 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	printf("Choose an action:\n");
 	printf("1- Place Building\n");
 	printf("2- Place Unit\n");
+	printf("3- End Turn\n");
 	scanf("%d", &choice);
 
-	switch (choice)
-	{
 
+	switch (choice)
+		{
 	case 1:
-		PlaceBuilding(board, gondorBuildings, mordorBuildings);
+		PlaceBuilding(board, gondorBuildings, mordorBuildings, coins);
 		break;
 	case 2:
 		PlaceUnit(board, (currentPlayer == 1) ? &gondorUnits[0] : &mordorUnits[0]);
 		break;
+	case 3:
+		printf("Turn Ended.\n");
+		endTurn = 1;
+		break;
 	default:
 		printf("Invalid choice. Turn skipped.\n");
-	}
+		}
+	}while(endTurn != 1);
 }
 
-void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[])
+void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct CastarCoins *coins)
 {
 	int row;
 	int choice;
@@ -252,6 +260,14 @@ void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[],
 	{
 		// Set the chosen building
 		struct Building *building = &buildingArray[choice - 1];
+				if (currentPlayer == 1)
+		{
+			coins->gon -= building->cost;
+		}
+		else
+		{
+			coins->mor -= building->cost;
+		}
 		PlaceBuildingHelper(board, building);
 	}
 	else
