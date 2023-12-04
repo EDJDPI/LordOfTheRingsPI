@@ -25,6 +25,7 @@ struct Unit {
 	int cost;
 	int attackPower;
 	int health;
+	int moveCost;
 };
 
 // Struct for representing player resources
@@ -65,16 +66,16 @@ int main()
 	};
 
 	struct Unit gondorUnits[] = {
-		{"G", 2, 5, 30},
-		{"SK", 1, 7, 40},
-		{"T", 3, 10, 20}
+		{"G", 10, 5, 30, 2},
+		{"SK", 15, 7, 40, 1},
+		{"T", 20, 10, 20, 3}
 
 	};
 
 	struct Unit mordorUnits[] = {
-		{"OW", 2, 5, 30},
-		{"W", 1, 7, 40},
-		{"ST", 3, 10, 20}
+		{"OW", 10, 5, 30, 2},
+		{"W", 15, 7, 40, 1},
+		{"ST", 20, 10, 20, 3}
 	};
 
 	struct CastarCoins startingCoin;
