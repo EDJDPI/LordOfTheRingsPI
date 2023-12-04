@@ -59,6 +59,8 @@ void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[]
 // Run Program
 int main()
 {
+	HWND hwnd = GetConsoleWindow();
+    ShowWindow(hwnd, SW_MAXIMIZE);
 	struct Building gondorBuildings[] = {
 		{"GGGG", 30, 100},
 		{"RR", 25, 70},
@@ -457,7 +459,7 @@ void initializeBoard(char board[ROWS][COLUMNS])
 void printBoard(char board[ROWS][COLUMNS])
 {
 
-	system("cls");
+	system("clear");
 	printf("   ");
 	for (int j = 1; j < COLUMNS; j++)
 	{
