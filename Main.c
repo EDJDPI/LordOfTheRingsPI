@@ -4,6 +4,7 @@
 #include <string.h>
 #include <windows.h>
 
+
 #define ROWS 17
 #define COLUMNS 27
 
@@ -153,7 +154,7 @@ void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], str
 	while (gameStatus == 0)
 	{
 		// Display the board
-		printBoard(board);
+		
 
 		// Take a turn for the current player
 		TakeTurn(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
@@ -227,7 +228,9 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	int endTurn;
 	do
 	{
-		// Display Castar Coins information
+		system("cls");
+	printBoard(board);
+	// Display Castar Coins information
 		printf("%s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
 	// Allow the player to choose between placing a building or a unit
@@ -241,18 +244,26 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 
 		switch (choice)
 		{
-		case 1:
-			PlaceBuilding(board, gondorBuildings, mordorBuildings, gondorMines, mordorMines, coins);
-			break;
-		case 2:
-			PlaceUnit(board, gondorUnits, mordorUnits, coins);
-			break;
-		case 3:
-			printf("Turn Ended.\n");
-			endTurn = 1;
-			break;
-		default:
-			printf("Invalid choice. Turn skipped.\n");
+	case 1:
+		PlaceBuilding(board, gondorBuildings, mordorBuildings, coins);
+		break;
+	case 2:
+		PlaceUnit(board, gondorUnits, mordorUnits, coins);
+		break;
+	case 3:
+		printf("Turn Ended.\n");
+		endTurn = 1;
+		if (currentPlayer == 1)
+		{
+			coins->gon += 15;
+		}
+		else
+		{
+			coins->mor += 15;
+		}
+		break;
+	default:
+		printf("Invalid choice. Turn skipped.\n");
 		}
 	} while (endTurn != 1);
 }
@@ -367,19 +378,37 @@ void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building)
 {
 	int row;
 	int success = 0;
+	char suca = 0;
 
 	do
 	{
-		// Get input for building placement
+
 		printf("Enter the row (1-%d): ", ROWS - 1);
-		scanf("%d", &row);
+		scanf(" %c", &suca);
+
+		if(suca < 1 || suca > ROWS - 1 )
+		{	
+			while(suca < 1 || suca > ROWS - 1)
+			{
+				printf("Invalid row. Please choose a valid row.");
+				printf("Enter the row (1-%d): ", ROWS - 1);
+				scanf(" %c", &suca);
+			}
+		}
+		
+		row = suca - '0';
 
 		// Check if the row is valid
-		if (row < 1 || row >= ROWS)
+		if (row < 1 || row >= ROWS) 
 		{
 			printf("Invalid row. Please choose a valid row.\n");
-			return;
 		}
+		else
+		{
+			row += 1;
+		}
+		
+		
 
 		// Convert column input to uppercase
 		char column;
