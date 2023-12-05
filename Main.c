@@ -175,7 +175,7 @@ void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], str
 	while (gameStatus == 0)
 	{
 		// Display the board
-		printBoard(board);
+		
 
 		// Take a turn for the current player
 		TakeTurn(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
@@ -219,7 +219,7 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 
 	int choice;
 
-	system("cls");
+	system("clear");
 	printf("------- GAME MENU ---------\n");
 	printf("------- 1-Start Game ------\n");
 	printf("------- 2-Load Game -------\n");
@@ -231,19 +231,19 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	switch (choice)
 	{
 	case 1:
-		system("cls");
+		system("clear");
 		SelectGameMode(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins);
 		break;
 	case 2:
-		system("cls");
+		system("clear");
 		printf("Loading game...");
 		break;
 	case 3:
-		system("cls");
+		system("clear");
 		printf("Menu Options : ");
 		break;
 	case 4:
-		system("cls");
+		system("clear");
 		printf("Exiting the game!!");
 		break;
 	}
@@ -256,8 +256,10 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 {
 	int choice;
 	int endTurn = 0;
-
-
+	do
+	{
+		system("clear");
+		printBoard(board);
 		// Display Castar Coins information
 		printf("%s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
@@ -289,8 +291,18 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 
 		default:
 			printf("Invalid choice. Turn skipped.\n");
-
 		}
+
+		if (coins->gon <= 0 || coins->mor <= 0)
+        {
+            printf("Player has no coins left. Turn Ended.\n");
+            endTurn = 1;
+			if (currentPlayer == 1)
+				coins->gon += 15;
+			else
+				coins->mor += 15;
+        }
+	}while(endTurn != 1);
 }
 
 
@@ -486,7 +498,7 @@ void initializeBoard(char board[ROWS][COLUMNS])
 void printBoard(char board[ROWS][COLUMNS])
 {
 
-	system("cls");
+	system("clear");
 	printf("   ");
 	for (int j = 1; j < COLUMNS; j++)
 	{
