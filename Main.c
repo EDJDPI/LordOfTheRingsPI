@@ -11,9 +11,6 @@ int currentPlayer; // 1 for GONDOR, 2 for MORDOR
 int gameStatus = 0;
 int turnNumber = 0;
 
-
-
-
 //Structs
 struct Building
 {
@@ -257,15 +254,17 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	int choice;
 	int endTurn = 0;
 
-
+	while (endTurn != 1)
+	{
 		// Display Castar Coins information
-		printf("%s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
+		printf("\n\n\n %s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
 		// Allow the player to choose between placing a building or a unit
 		printf("Choose an action:\n");
 		printf("1- Place Building\n");
 		printf("2- Place Unit\n");
 		printf("3- End Turn\n");
+		printf("4- Show Board");
 		scanf("%d", &choice);
 
 		switch (choice)
@@ -287,10 +286,14 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 				coins->mor += 15;
 			break;
 
+		case 4:
+			printBoard(board);
+			break;
+
 		default:
 			printf("Invalid choice. Turn skipped.\n");
-
 		}
+	}
 }
 
 
@@ -487,7 +490,7 @@ void printBoard(char board[ROWS][COLUMNS])
 {
 
 	system("cls");
-	printf("   ");
+	printf("\n\n   ");
 	for (int j = 1; j < COLUMNS; j++)
 	{
 		printf("%3c ", 'A' + j - 1);
