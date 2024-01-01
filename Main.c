@@ -295,9 +295,10 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 		printf("Choose an action:\n");
 		printf("1- Place Building\n");
 		printf("2- Place Unit\n");
-		printf("3- End Turn\n");
-		printf("4- Show Board\n");
-		printf("5 - Place hero\n");
+		printf("3 - Place hero\n");
+		printf("4- End Turn\n");
+		printf("5- Show Board\n");
+		
 		scanf("%d", &choice);
 
 		switch (choice)
@@ -309,6 +310,10 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 			PlaceUnit(board, gondorUnits, mordorUnits, coins);
 			break;
 		case 3:
+			PlaceHero(board, Gandalf, coins);
+			break;	
+			
+		case 4:
 			printf("Turn Ended. Player receives 15 coins.\n");
 			endTurn = 1;
 
@@ -319,13 +324,12 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 				coins->mor += 15;
 			break;
 
-		case 4:
+
+
+		case 5:
 			printBoard(board);
 			break;
 
-		case 5:
-			PlaceHero(board, Gandalf, coins);
-			break;
 		
 		default:
 			printf("Invalid choice. Turn skipped.\n");
