@@ -635,41 +635,74 @@ void initializeBoard(char board[ROWS][COLUMNS])
 
 
 // Print the game board
-void printBoard(char board[ROWS][COLUMNS])
+ void printBoard(char board[ROWS][COLUMNS])
 {
+    system("cls");
 
-	system("cls");
-	printf("\n\n   ");
-	for (int j = 1; j < COLUMNS; j++)
-	{
-		printf("%3c ", 'A' + j - 1);
-	}
-	printf("\n");
+    printf("\n\n");
 
-	// Print game board
-	for (int i = 1; i < ROWS; i++)
-	{
-		// Print row label
-		printf("%2d ", i);
+    // Print column labels
+    printf("   ");
+    for (int j = 1; j < COLUMNS; j++)
+    {
+        printf(" %c ", 'A' + j - 1);
+    }
+    printf("\n");
 
-		// Print row content
-		for (int j = 1; j < COLUMNS; j++)
-		{
-			printf("| %c ", board[i][j]);
-		}
+    // Print top border above the first row
+    printf("   ");
+    printf("%c", 218);
+    for (int j = 1; j < COLUMNS; j++)
+    {
+        if (j < COLUMNS - 1)
+            printf("%c%c%c%c", 196, 196, 196, 194);
+        else
+            printf("%c%c%c%c", 196, 196, 196, 191);
+    }
+    printf("\n");
 
-		printf("|\n");
+    // Print game board
+    for (int i = 1; i < ROWS; i++)
+    {
+        // Print row label
+        printf("%2d ", i);
 
-		// Print row separator
-		printf("  ");
-		for (int j = 1; j < COLUMNS; j++)
-		{
-			printf("+---");
-		}
-		printf("+\n");
-	}
+        // Print row content
+        for (int j = 1; j < COLUMNS; j++)
+        {
+            printf("%c %c ", 179, board[i][j]);
+        }
+
+        printf("%c\n", 179);
+
+        // Print row separator
+        if (i < ROWS - 1)
+        {
+            printf("   ");
+            printf("%c", 195);
+            for (int j = 1; j < COLUMNS; j++)
+            {
+                if (j < COLUMNS - 1)
+                    printf("%c%c%c%c", 196, 196, 196, 197);
+                else
+                    printf("%c%c%c%c", 196, 196, 196, 180);
+            }
+            printf("\n");
+        }
+    }
+
+    // Print bottom border below the last row
+    printf("   ");
+    printf("%c", 192);
+    for (int j = 1; j < COLUMNS; j++)
+    {
+        if (j < COLUMNS - 1)
+            printf("%c%c%c%c", 196, 196, 196, 193);
+        else
+            printf("%c%c%c%c", 196, 196, 196, 217);
+    }
+    printf("\n");
 }
-
 
 
 // Insert content into a specific grid square
