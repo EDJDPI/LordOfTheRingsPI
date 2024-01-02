@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <time.h>
 #include <string.h>
 #include <windows.h>
@@ -19,6 +20,9 @@ struct Building
 	char name[20];
 	int cost;
 	int health;
+	int buildID;
+	int row;
+	int col;
 };
 
 // Struct for representing units
@@ -29,6 +33,9 @@ struct Unit
 	int attackPower;
 	int health;
 	int cost;
+	int UnitID;
+	int row;
+	int col;
 };
 struct Mines
 {
@@ -36,6 +43,9 @@ struct Mines
 	int cost;
 	int health;
 	int coinsperturn;
+	int mineID;
+	int row;
+	int col;
 };
 
 // Struct for representing player resources
@@ -57,31 +67,61 @@ typedef struct SpecialChar
 	};
 }Heros;
 
+struct PlacedEntity {
+    int row;
+    char col;
+    int health;
+    char type[20];  // Assuming a maximum length for the entity type
+    int side;       // 1 for Gondor, 2 for Mordor
+};
 
 // Function declarations
 void initializeBoard(char board[ROWS][COLUMNS]);
 void printBoard(char board[ROWS][COLUMNS]);
 void insertContent(char board[ROWS][COLUMNS], int row, int col, char content);
-void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[]);
-void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[]);
-void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[]);
+void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount);
 int CheckWin(struct Building gondorBuildings[], struct Building mordorBuildings[]);
-void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins);
-void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *unitArray);
-void PlaceBuilding(char board[ROWS][COLUMNS], struct Building mordorBuildings[], struct Building gondorBuildings[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins);
-void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building);
-void PlaceHero(char board[ROWS][COLUMNS], Heros *hero, struct CastarCoins *coins);
-void PlaceHeroHelper(char board[ROWS][COLUMNS], Heros *hero);
-void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[]);
-void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[]);
+void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins,struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *unitArray,struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void PlaceBuilding(char board[ROWS][COLUMNS], struct Building mordorBuildings[], struct Building gondorBuildings[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins,struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building, struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void PlaceHero(char board[ROWS][COLUMNS], Heros *hero, struct PlacedEntity **placedHeroes, int *placedHeroCount, struct CastarCoins *coins);
+void PlaceHeroHelper(char board[ROWS][COLUMNS], Heros *hero, struct PlacedEntity **placedHeroes, int *placedHeroCount, struct CastarCoins *coins);
+void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount);
+void moverPeca(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int placedHeroCount, Heros Gandalf[], struct CastarCoins *coins);
 
 
+void debugPrintEntities(FILE *file, struct PlacedEntity *entities, int entityCount) {
+    fprintf(file, "Debugging Placed Entities:\n");
+
+    for (int i = 0; i < entityCount; ++i) {
+        fprintf(file, "Entity %d:\n", i + 1);
+        fprintf(file, "Type: %s\n", entities[i].type);
+        fprintf(file, "Side: %d\n", entities[i].side);
+        fprintf(file, "Row: %d\n", entities[i].row);
+        fprintf(file, "Column: %c\n", entities[i].col);
+        fprintf(file, "Health: %d\n", entities[i].health);
+        fprintf(file, "------------------------\n");
+    }
+
+    fprintf(file, "End of Placed Entities Debug\n");
+}
 
 
 
 // Run Program
 int main()
 {
+
+	   FILE *debugFile = fopen("debug_output.txt", "w");
+    if (debugFile == NULL) {
+        fprintf(stderr, "Error opening debug file.\n");
+        exit(EXIT_FAILURE);
+    }
+
 	struct Building gondorBuildings[] = {
 		{"GGGG", 30, 100},
 		{"RR", 25, 70},
@@ -129,19 +169,31 @@ int main()
 		}
 	};
 
+
+	struct PlacedEntity *placedHeroes = NULL;
+	int placedHeroCount = 0;
+
 	struct CastarCoins startingCoin;
 	startingCoin.gon = 100;
 	startingCoin.mor = 100;
 
 	char gameBoard[ROWS][COLUMNS];
 	initializeBoard(gameBoard);
-	MainMenu(gameBoard, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, &startingCoin, Gandalf);
+	MainMenu(gameBoard, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, &startingCoin, Gandalf, &placedHeroes, &placedHeroCount);
+
+
+	debugPrintEntities(debugFile, placedHeroes, placedHeroCount);
+
+    // Close the debug file
+    fclose(debugFile);
+
+	free(placedHeroes);
 	return 0;
 }
 
 
 
-void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[])
+void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
 	int choice;
 	printf("Choose one option below: \n");
@@ -156,15 +208,87 @@ void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[]
 		}
 		else if (choice == 2)
 		{
-			SelectSides(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf);
+			SelectSides(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf, placedHeroes, placedHeroCount);
 		}
 	} while (choice != 1 && choice != 2);
 }
 
 
+void moverPeca(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int placedHeroCount, Heros Gandalf[], struct CastarCoins *coins)
+{
+    char fromC, toC;
+    int fromL, toL;
+
+    // as coordenadas da peça a ser movida
+    printf("Digite as coordenadas da peca a ser movida (linha/coluna): ");
+    scanf("%d %c", &fromL, &fromC);
+
+    // Validate coordinates
+    if (fromL < 1 || fromL >= ROWS || fromC < 'A' || fromC > 'Z')
+    {
+        printf("Coordenadas invalidas. Tente novamente.\n");
+        return;
+    }
+
+    fromC = toupper(fromC); // Convert to uppercase
+
+    // Find the entity at the specified coordinates
+    int entityIndex = -1;
+    for (int i = 0; i < placedHeroCount; i++)
+    {
+        if (placedHeroes[i].row == fromL && placedHeroes[i].col == fromC)
+        {
+            entityIndex = i;
+            break;
+        }
+    }
+
+    if (entityIndex == -1)
+    {
+        printf("Nenhuma peca encontrada nas coordenadas especificadas.\n");
+        return;
+    }
+
+    // as coordenadas para onde a peça será movida
+    printf("Digite as coordenadas para onde a peca sera movida (linha/coluna): ");
+    scanf("%d %c", &toL, &toC);
+
+    // Validate coordinates
+    if (toL < 1 || toL >= ROWS || toC < 'A' || toC > 'Z')
+    {
+        printf("Coordenadas invalidas. Tente novamente.\n");
+        return;
+    }
+
+    toC = toupper(toC); // Convert to uppercase
+
+    // Check if the target cell is empty
+    if (board[toL][toC - 'A'] != ' ')
+    {
+        printf("A posicao de destino ja esta ocupada. Escolha outra posicao.\n");
+        return;
+    }
+
+    // Update the board
+// Update the board
+for (int i = 0; i < strlen(placedHeroes[entityIndex].type); i++) {
+    board[toL][toC - 'A' + i] = placedHeroes[entityIndex].type[i];
+}
+
+// Clear the cells of the previous position
+for (int i = 0; i < strlen(placedHeroes[entityIndex].type); i++) {
+    board[fromL][fromC - 'A' + i] = ' ';
+}
+
+    // Update the PlacedEntity
+    placedHeroes[entityIndex].row = toL;
+    placedHeroes[entityIndex].col = toC;
+
+    printf("Peca movida com sucesso!\n");
+}
 
 
-void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[])
+void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
 
 	int choice;
@@ -179,13 +303,13 @@ void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], s
 		{
 			printf("You have chosen the GONDOR side!!\n\n");
 			currentPlayer = 1;
-			StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf);
+			StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf, placedHeroes, placedHeroCount);
 		}
 		else if (choice == 2)
 		{
 			printf("You have chosen MORDOR side!!\n\n");
 			currentPlayer = 2;
-			StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf);
+			StartGame(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf, placedHeroes, placedHeroCount);
 		}
 		else
 		{
@@ -198,7 +322,7 @@ void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], s
 
 
 
-void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[])
+void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
 	while (gameStatus == 0)
 	{
@@ -206,10 +330,10 @@ void StartGame(char board[ROWS][COLUMNS], struct Building gondorBuildings[], str
 		printBoard(board);
 
 		// Take a turn for the current player
-		TakeTurn(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf);
+		TakeTurn(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf, placedHeroes, placedHeroCount);
 
 		// Check for a win or a draw
-		gameStatus = CheckWin(gondorBuildings, mordorBuildings);
+		gameStatus = 1;
 
 		// Switch to the next player for the next turn
 		currentPlayer = (currentPlayer == 1) ? 2 : 1;
@@ -242,7 +366,7 @@ int CheckWin(struct Building gondorBuildings[], struct Building mordorBuildings[
 
 
 // Main menu
-void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[])
+void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
 
 	int choice;
@@ -260,7 +384,7 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 	{
 	case 1:
 		system("cls");
-		SelectGameMode(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf);
+		SelectGameMode(board, gondorBuildings, mordorBuildings, gondorUnits, mordorUnits, gondorMines, mordorMines, coins, Gandalf, placedHeroes, placedHeroCount);
 		break;
 	case 2:
 		system("cls");
@@ -280,69 +404,68 @@ void MainMenu(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
 
 
 
-void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[])
+void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
-	int choice;
-	int endTurn = 0;
-	int selectedRow;
-	char selectedColumn;
+    int choice;
+    int endTurn = 0;
+    int selectedRow;
+    char selectedColumn;
 
+    while (endTurn != 1)
+    {
+        // Display Castar Coins information
+        printf("\n\n\n %s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
 
-	while (endTurn != 1)
-	{
-		// Display Castar Coins information
-		printf("\n\n\n %s side turn - Castar Coins: Gondor %d, Mordor %d\n", (currentPlayer == 1) ? "Gondor" : "Mordor", coins->gon, coins->mor);
+        // Allow the player to choose between placing a building, unit, hero, moving a piece, or ending the turn
+        printf("Choose an action:\n");
+        printf("1- Place Building\n");
+        printf("2- Place Unit\n");
+        printf("3- Place Hero\n");
+        printf("4- Move Piece\n");
+        printf("5- End Turn\n");
+        printf("6- Show Board\n");
 
-		// Allow the player to choose between placing a building or a unit
-		printf("Choose an action:\n");
-		printf("1- Place Building\n");
-		printf("2- Place Unit\n");
-		printf("3- Place Hero\n");
-		printf("4- End Turn\n");
-		printf("5- Show Board\n");
-		
-		scanf("%d", &choice);
+        scanf("%d", &choice);
 
-		switch (choice)
-		{
-		case 1:
-			PlaceBuilding(board, gondorBuildings, mordorBuildings, gondorMines, mordorMines, coins);
-			break;
-		case 2:
-			PlaceUnit(board, gondorUnits, mordorUnits, coins);
-			break;
-		case 3:
-			PlaceHero(board, Gandalf, coins);
-			break;	
-			
-		case 4:
-			printf("Turn Ended. Player receives 15 coins.\n");
-			endTurn = 1;
+        switch (choice)
+        {
+        case 1:
+            PlaceBuilding(board, gondorBuildings, mordorBuildings, gondorMines, mordorMines, coins, placedHeroes, placedHeroCount);
+            break;
+        case 2:
+            PlaceUnit(board, gondorUnits, mordorUnits, coins, placedHeroes, placedHeroCount);
+            break;
+        case 3:
+            PlaceHero(board, Gandalf, placedHeroes, placedHeroCount, coins);
+            break;
+        case 4:
+            moverPeca(board, *placedHeroes, *placedHeroCount, Gandalf, coins);
+            break;
+        case 5:
+            printf("Turn Ended. Player receives 15 coins.\n");
+            endTurn = 1;
 
-			// Reward the player with 15 coins
-			if (currentPlayer == 1)
-				coins->gon += 15;
-			else
-				coins->mor += 15;
-			break;
+            // Reward the player with 15 coins
+            if (currentPlayer == 1)
+                coins->gon += 15;
+            else
+                coins->mor += 15;
 
-
-
-		case 5:
-			printBoard(board);
-			break;
-
-		
-		default:
-			printf("Invalid choice. Turn skipped.\n");
-		}
-	}
+            break;
+        case 6:
+            printBoard(board);
+            break;
+        default:
+            printf("Invalid choice. Turn skipped.\n");
+        }
+    }
 }
 
 
 
 
-void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins)
+
+void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins,struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
 	int choice;
 
@@ -371,7 +494,7 @@ void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[],
 		{
 			coins->mor -= building->cost;
 		}
-		PlaceBuildingHelper(board, building);
+		PlaceBuildingHelper(board, building,placedHeroes, placedHeroCount);
 	}
 
 	else
@@ -383,7 +506,7 @@ void PlaceBuilding(char board[ROWS][COLUMNS], struct Building gondorBuildings[],
 
 
 
-void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins)
+void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit mordorUnits[], struct CastarCoins *coins,struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
 	struct Unit *unitArray = (currentPlayer == 1) ? gondorUnits : mordorUnits;
 	int choice;
@@ -410,7 +533,7 @@ void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit
 		{
 			coins->mor -= units->cost;
 		}
-		PlaceUnitHelper(board, units);
+		PlaceUnitHelper(board, units, placedHeroes, placedHeroCount);
 	}
 	else
 	{
@@ -418,13 +541,11 @@ void PlaceUnit(char board[ROWS][COLUMNS], struct Unit gondorUnits[], struct Unit
 	}
 }
 
-void PlaceHero(char board[ROWS][COLUMNS], Heros *hero, struct CastarCoins *coins)
+void PlaceHero(char board[ROWS][COLUMNS], Heros *hero, struct PlacedEntity **placedHeroes, int *placedHeroCount, struct CastarCoins *coins)
 {
-    
     int choice;
 
-
-    // Logic to choose a building
+    // Logic to choose a hero
     printf("Choose Hero:\n");
 
     printf("1-Gandalf\n");
@@ -432,79 +553,97 @@ void PlaceHero(char board[ROWS][COLUMNS], Heros *hero, struct CastarCoins *coins
 
     if (choice == 1)
     {
-            if (currentPlayer == 1 && heroGon < hero->uPT)
-                {coins->gon -= hero->character.cost;
-				heroGon++;
-				PlaceHeroHelper(board, hero);
-				}
-				
-			else if (currentPlayer == 2 && heroMon < hero->uPT)
-				{coins->mor -= hero->character.cost;
-				heroMon++;
-				PlaceHeroHelper(board, hero);
-				}
-			else if (heroMon >= hero->uPT || heroGon >= hero->uPT)
-			{
-				printf("Ja tem um Heroi\n");
-			}
-			
-			
+        if ((currentPlayer == 1 && heroGon < hero->uPT) || (currentPlayer == 2 && heroMon < hero->uPT))
+        {
+            if (currentPlayer == 1)
+            {
+                coins->gon -= hero->character.cost;
+                heroGon++;
+            }
+            else
+            {
+                coins->mor -= hero->character.cost;
+                heroMon++;
+            }
+            PlaceHeroHelper(board, hero, placedHeroes, placedHeroCount, coins);
+        }
+        else
+        {
+            printf("You already have a hero placed.\n");
+        }
     }
 }
 
-void PlaceHeroHelper(char board[ROWS][COLUMNS], Heros *hero)
+
+
+void PlaceHeroHelper(char board[ROWS][COLUMNS], Heros *hero, struct PlacedEntity **placedHeroes, int *placedHeroCount, struct CastarCoins *coins)
 {
-	int row = 0;
-	int success = 0;
-	do
-	{
+    int row = 0;
+    int success = 0;
 
-		printf("Enter the row (1-%d): ", ROWS - 1);
-		while (scanf("%d", &row) != 1 || row < 1 || row >= ROWS)
-		{
-			printf("Invalid input. Please enter a valid row.\n");
-			printf("Enter the row (1-%d): ", ROWS - 1);
-			// Clear the input buffer in case of non-integer input
-			while (getchar() != '\n');
-		}
+    do
+    {
+        printf("Enter the row (1-%d): ", ROWS - 1);
+        while (scanf("%d", &row) != 1 || row < 1 || row >= ROWS)
+        {
+            printf("Invalid input. Please enter a valid row.\n");
+            printf("Enter the row (1-%d): ", ROWS - 1);
+            // Clear the input buffer in case of non-integer input
+            while (getchar() != '\n');
+        }
 
-		// Convert column input to uppercase
-		char column;
-		printf("Enter the column (A-Z): ");
-		scanf(" %c", &column);
-		column = column + 1;
-		column = toupper(column);
+        char column;
+        printf("Enter the column (A-Z): ");
+        scanf(" %c", &column);
+        column = toupper(column);
 
-		// Check if the selected cell is empty
-		if (column >= 'A' && column <= 'Z' && board[row][column - 'A'] == ' ')
-		{
-			// Check if placing the building exceeds the maximum column index (16)
-			int heroLength = strlen(hero->character.name);
-			if (heroLength + (column - 'A') > 16)
-			{
-				printf("Not enough space in the row for the entire building. Please choose another location.\n");
-				Sleep(1000);
-			}
-			else
-			{
-				// Place the building
-				for (int i = 0; hero->character.name[i] != '\0'; i++)
-				{
-					board[row][column - 'A' + i] = hero->character.name[i];
-				}
-				printf("Building placed successfully!\n");
-				success = 1;
-			}
-		}
-		else
-		{
-			printf("Invalid column or selected cell is occupied. Please choose a valid and empty cell.\n");
-		}
+        printf("DEBUG: Hero name: %s\n", hero->character.name);
 
-	} while (success != 1);
+        if (column >= 'A' && column <= 'Z' && board[row][column - 'A'] == ' ')
+        {
+            printf("DEBUG: Column is valid, cell is empty.\n");
+
+            int heroLength = strlen(hero->character.name);
+            if (heroLength + (column - 'A') >= COLUMNS)
+            {
+                printf("DEBUG: Not enough space in the row for the entire hero. Please choose another location.\n");
+                Sleep(1000);
+            }
+            else
+            {
+                // Place the hero
+                for (int i = 0; hero->character.name[i] != '\0'; i++)
+                {
+                    board[row][column - 'A' + i + 1] = hero->character.name[i];
+                }
+
+                *placedHeroCount += 1;
+                *placedHeroes = realloc(*placedHeroes, *placedHeroCount * sizeof(struct PlacedEntity));
+
+                // Initialize the new PlacedEntity
+                struct PlacedEntity newHero;
+                newHero.row = row;
+                newHero.col = column;
+                newHero.health = 100;
+                strcpy(newHero.type, hero->character.name);
+                newHero.side = currentPlayer;
+
+                // Store the new PlacedEntity in the array
+                (*placedHeroes)[*placedHeroCount - 1] = newHero;
+
+                printf("DEBUG: Hero placed successfully!\n");
+                success = 1;
+            }
+        }
+        else
+        {
+            printf("DEBUG: Invalid column or selected cell is occupied. Please choose a valid and empty cell.\n");
+        }
+
+    } while (success != 1);
 }
 
-void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *units)
+void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *units, struct PlacedEntity **placedHeroes, int *placedHeroCount )
 {
 	int row = 0;
 	int success = 0;
@@ -546,6 +685,20 @@ void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *units)
 				{
 					board[row][column - 'A' + i] = units->name[i];
 				}
+				*placedHeroCount += 1;
+                *placedHeroes = realloc(*placedHeroes, *placedHeroCount * sizeof(struct PlacedEntity));
+
+                // Initialize the new PlacedEntity
+                struct PlacedEntity newHero;
+                newHero.row = row;
+                newHero.col = column;
+                newHero.health = 100;
+                strcpy(newHero.type, units->name);
+                newHero.side = currentPlayer;
+
+                // Store the new PlacedEntity in the array
+                (*placedHeroes)[*placedHeroCount - 1] = newHero;
+
 				printf("Building placed successfully!\n");
 				success = 1;
 			}
@@ -562,7 +715,7 @@ void PlaceUnitHelper(char board[ROWS][COLUMNS], struct Unit *units)
 
 
 
-void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building)
+void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building, struct PlacedEntity **placedHeroes, int *placedHeroCount)
 {
 	int row = 0;
 	int success = 0;
@@ -602,8 +755,21 @@ void PlaceBuildingHelper(char board[ROWS][COLUMNS], struct Building *building)
 				// Place the building
 				for (int i = 0; building->name[i] != '\0'; i++)
 				{
-					board[row][column - 'A' + i] = building->name[i];
+					board[row][column - 'A' + i + 1] = building->name[i];
 				}
+				*placedHeroCount += 1;
+                *placedHeroes = realloc(*placedHeroes, *placedHeroCount * sizeof(struct PlacedEntity));
+
+                // Initialize the new PlacedEntity
+                struct PlacedEntity newHero;
+                newHero.row = row;
+                newHero.col = column;
+                newHero.health = 100;
+                strcpy(newHero.type, building->name);
+                newHero.side = currentPlayer;
+
+                // Store the new PlacedEntity in the array
+                (*placedHeroes)[*placedHeroCount - 1] = newHero;
 				printf("Building placed successfully!\n");
 				success = 1;
 			}
@@ -645,7 +811,7 @@ void initializeBoard(char board[ROWS][COLUMNS])
     printf("   ");
     for (int j = 1; j < COLUMNS; j++)
     {
-        printf(" %c ", 'A' + j - 1);
+        printf(" %2c ", 'A' + j - 1);
     }
     printf("\n");
 
