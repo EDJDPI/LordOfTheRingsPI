@@ -91,7 +91,7 @@ void PlaceHero(char board[ROWS][COLUMNS], Heros *hero, struct PlacedEntity **pla
 void PlaceHeroHelper(char board[ROWS][COLUMNS], Heros *hero, struct PlacedEntity **placedHeroes, int *placedHeroCount, struct CastarCoins *coins);
 void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount);
 void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount);
-void moverPeca(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int placedHeroCount, Heros Gandalf[], struct CastarCoins *coins);
+void MovePiece(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int placedHeroCount, Heros Gandalf[], struct CastarCoins *coins);
 
 
 void debugPrintEntities(FILE *file, struct PlacedEntity *entities, int entityCount) {
@@ -214,19 +214,19 @@ void SelectGameMode(char board[ROWS][COLUMNS], struct Building gondorBuildings[]
 }
 
 
-void moverPeca(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int placedHeroCount, Heros Gandalf[], struct CastarCoins *coins)
+void MovePiece(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int placedHeroCount, Heros Gandalf[], struct CastarCoins *coins)
 {
     char fromC, toC;
     int fromL, toL;
 
     // as coordenadas da peça a ser movida
-    printf("Digite as coordenadas da peca a ser movida (linha/coluna): ");
+    printf("Type the coordinates of the piece you want to move(linha/coluna): ");
     scanf("%d %c", &fromL, &fromC);
 
     // Validate coordinates
     if (fromL < 1 || fromL >= ROWS || fromC < 'A' || fromC > 'Z')
     {
-        printf("Coordenadas invalidas. Tente novamente.\n");
+        printf("Invalid coordinates.\n");
         return;
     }
 
@@ -245,18 +245,18 @@ void moverPeca(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int
 
     if (entityIndex == -1)
     {
-        printf("Nenhuma peca encontrada nas coordenadas especificadas.\n");
+        printf("No entities found in that cell.\n");
         return;
     }
 
     // as coordenadas para onde a peça será movida
-    printf("Digite as coordenadas para onde a peca sera movida (linha/coluna): ");
+    printf("Type the Coordinates to where you want them to go (row and col): ");
     scanf("%d %c", &toL, &toC);
 
     // Validate coordinates
     if (toL < 1 || toL >= ROWS || toC < 'A' || toC > 'Z')
     {
-        printf("Coordenadas invalidas. Tente novamente.\n");
+        printf("Invalid Coordinates.\n");
         return;
     }
 
@@ -265,27 +265,28 @@ void moverPeca(char board[ROWS][COLUMNS], struct PlacedEntity *placedHeroes, int
     // Check if the target cell is empty
     if (board[toL][toC - 'A'] != ' ')
     {
-        printf("A posicao de destino ja esta ocupada. Escolha outra posicao.\n");
+        printf("Occuppied cell.\n");
         return;
     }
 
     // Update the board
 // Update the board
 for (int i = 0; i < strlen(placedHeroes[entityIndex].type); i++) {
-    board[toL][toC - 'A' + i] = placedHeroes[entityIndex].type[i];
+    board[toL][toC - 'A' + i + 1] = placedHeroes[entityIndex].type[i];
 }
 
 // Clear the cells of the previous position
 for (int i = 0; i < strlen(placedHeroes[entityIndex].type); i++) {
-    board[fromL][fromC - 'A' + i] = ' ';
+    board[fromL][fromC - 'A' + i + 1] = ' ';
 }
 
     // Update the PlacedEntity
     placedHeroes[entityIndex].row = toL;
     placedHeroes[entityIndex].col = toC;
 
-    printf("Peca movida com sucesso!\n");
+    printf("\nSuccessfully done!\n");
 }
+
 
 
 void SelectSides(char board[ROWS][COLUMNS], struct Building gondorBuildings[], struct Building mordorBuildings[], struct Unit gondorUnits[], struct Unit mordorUnits[], struct Mines gondorMines[], struct Mines mordorMines[], struct CastarCoins *coins, Heros Gandalf[], struct PlacedEntity **placedHeroes, int *placedHeroCount)
@@ -439,7 +440,7 @@ void TakeTurn(char board[ROWS][COLUMNS], struct Building gondorBuildings[], stru
             PlaceHero(board, Gandalf, placedHeroes, placedHeroCount, coins);
             break;
         case 4:
-            moverPeca(board, *placedHeroes, *placedHeroCount, Gandalf, coins);
+            MovePiece(board, *placedHeroes, *placedHeroCount, Gandalf, coins);
             break;
         case 5:
             printf("Turn Ended. Player receives 15 coins.\n");
